@@ -39,6 +39,7 @@ function! loupe#hlmatch() abort
 
   if exists('*matchadd')
     let w:loupe_hlmatch=matchadd(l:highlight, l:pattern)
+    let g:hlmatch_timer=timer_start(1000, 'loupe#private#clear_hlmatch')
   endif
 endfunction
 

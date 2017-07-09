@@ -89,6 +89,13 @@ function! loupe#private#clear_highlight() abort
   endif
 endfunction
 
+function! loupe#private#clear_hlmatch(timer) abort
+  " only process the most recent timer
+  if a:timer == g:hlmatch_timer
+    call loupe#private#clear_highlight()
+  endif
+endfunction
+
 " Deactivate hlsearch once the configured timeout has passed since the most
 " recent search command.
 function! loupe#private#clear_hlsearch(timer) abort
