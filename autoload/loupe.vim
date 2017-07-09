@@ -27,6 +27,7 @@ function! loupe#hlmatch() abort
   if has('autocmd')
     augroup LoupeHightlightMatch
       autocmd!
+      autocmd WinLeave * :call loupe#private#clear_highlight()
     augroup END
   endif
 
