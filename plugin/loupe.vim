@@ -375,10 +375,21 @@ function s:MagicString()
   return s:magic ? '\v' : ''
 endfunction
 
+function s:UnMagicString()
+  let s:magic=get(g:, 'LoupeVeryMagic', 1)
+  return s:magic ? '' : '\v'
+endfunction
+
 nnoremap <expr> / loupe#private#prepare_highlight('/' . <SID>MagicString())
 nnoremap <expr> ? loupe#private#prepare_highlight('?' . <SID>MagicString())
 xnoremap <expr> / loupe#private#prepare_highlight('/' . <SID>MagicString())
 xnoremap <expr> ? loupe#private#prepare_highlight('?' . <SID>MagicString())
+
+nnoremap <expr> <Plug>(LoupeUnMagicForwardSearch)  loupe#private#prepare_highlight('/' . <SID>UnMagicString())
+nnoremap <expr> <Plug>(LoupeUnMagicBackwardSearch) loupe#private#prepare_highlight('?' . <SID>UnMagicString())
+xnoremap <expr> <Plug>(LoupeUnMagicForwardSearch)  loupe#private#prepare_highlight('/' . <SID>UnMagicString())
+xnoremap <expr> <Plug>(LoupeUnMagicBackwardSearch) loupe#private#prepare_highlight('?' . <SID>UnMagicString())
+
 if !empty(s:MagicString())
   " Any single-byte character may be used as a delimiter except \, ", | and
   " alphanumerics. See `:h E146`.
