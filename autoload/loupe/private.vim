@@ -10,6 +10,10 @@
 " Doesn't handle the full list of possible range types (specified in `:h
 " cmdline-ranges`), but catches the most common ones.
 function! loupe#private#very_magic_slash(slash) abort
+  if !get(g:, 'LoupeVeryMagic', 1)
+    return a:slash
+  endif
+
   if getcmdtype() != ':'
     return a:slash
   endif
