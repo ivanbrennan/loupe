@@ -1,3 +1,7 @@
+" Known issues:
+" * Canceling a search leaves hlsearch highlight behind.
+" * All the magic-string stuff should be moved to a different plugin,
+"   as it's no longer coupled to the search highlighting functionality.
 if exists('g:loaded_loupe') | finish | endif
 let g:loaded_loupe = 1
 
