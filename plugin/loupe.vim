@@ -3,13 +3,10 @@ let g:loaded_loupe = 1
 
 augroup LoupeHighlight
   autocmd!
-
-  autocmd InsertEnter,WinLeave * call loupe#clear_highlight()
+  autocmd CmdlineEnter     [/\?] call loupe#prepare_highlights()
   autocmd CmdlineEnter   [:>=@-] call loupe#clear_highlight()
-
-  autocmd CmdlineEnter [/\?] call loupe#prepare_highlights()
-
-  autocmd WinEnter * call loupe#cleanup()
+  autocmd InsertEnter,WinLeave * call loupe#clear_highlight()
+  autocmd WinEnter             * call loupe#cleanup()
 augroup END
 
 let s:clear=get(g:, 'loupe_toggle_highlight_map', 1)
