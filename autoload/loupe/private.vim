@@ -1,5 +1,49 @@
-" Copyright 2015-present Greg Hurrell. All rights reserved.
-" Licensed under the terms of the BSD 2-clause license.
+function! loupe#private#set_hlsearch(...)
+  call s:delete_hlmatch()
+  let &hlsearch = get(a:, 1, 1)
+endfunction
+
+function! s:delete_hlmatch()
+  if exists('w:loupe_hlmatch')
+    try
+      call matchdelete(w:loupe_hlmatch)
+    catch /\v<(E802|E803)>/
+      " https://github.com/wincent/loupe/issues/1
+    finally
+      unlet w:loupe_hlmatch
+    endtry
+  endif
+endfunction
+
+function! loupe#private#add_hlmatch() abort
+  call s:next_cursormove_clears_highlight()
+
+  let highlight = get(g:, 'LoupeHighlightGroup', 'IncSearch')
+  let pattern='\c\%#' . @/  " \c case insensitive
+                            " \%# current cursor position
+                            " @/ current search pattern
+  let w:loupe_hlmatch = matchadd(highlight, pattern)
+endfunction
+
+function! s:next_cursormove_clears_highlight()
+  augroup LoupeCursorMoved
+    autocmd!
+    autocmd CursorMoved * call loupe#clear_highlight()
+  augroup END
+endfunction
+
+function! loupe#private#next_cursormove_adds_hlmatch()
+  augroup LoupeCursorMoved
+    autocmd!
+    autocmd CursorMoved * call loupe#private#add_hlmatch()
+  augroup END
+endfunction
+
+function! loupe#private#remove_cursormove_autocmd()
+  augroup LoupeCursorMoved
+    autocmd!
+  augroup END
+endfunction
 
 " Dynamically returns "/" or "/\v" depending on the location of the just-typed
 " "/" within the command-line. Only "/" that looks to be at the start of a
@@ -10,7 +54,7 @@
 " Doesn't handle the full list of possible range types (specified in `:h
 " cmdline-ranges`), but catches the most common ones.
 function! loupe#private#very_magic_slash(slash) abort
-  if !get(g:, 'LoupeVeryMagic', 1)
+  if !get(g:, 'loupe_very_magic', 1)
     return a:slash
   endif
 
@@ -36,7 +80,7 @@ function! loupe#private#very_magic_slash(slash) abort
   endwhile
 
   if index(['g', 's', 'v'], l:cmd) != -1
-    return loupe#private#prepare_highlight(a:slash . '\v')
+    return a:slash . '\v'
   endif
 
   return a:slash
@@ -67,55 +111,4 @@ function! s:strip_ranges(cmdline)
   let l:cmdline=substitute(l:cmdline, '^;', '', '') " ; (separator)
 
   return l:cmdline
-endfunction
-
-" Prepare to highlight the match as soon as the cursor moves to it.
-function! loupe#private#prepare_highlight(result) abort
-  if has('autocmd')
-    augroup LoupeHightlightMatch
-      autocmd!
-      autocmd CursorMoved * :call loupe#hlmatch() | :call loupe#hlsearch()
-    augroup END
-  endif
-  return a:result
-endfunction
-
-" Clear previously applied match highlighting.
-function! loupe#private#clear_highlight() abort
-  if exists('w:loupe_hlmatch')
-    try
-      call matchdelete(w:loupe_hlmatch)
-    catch /\v<(E802|E803)>/
-      " https://github.com/wincent/loupe/issues/1
-    finally
-      unlet w:loupe_hlmatch
-    endtry
-  endif
-endfunction
-
-function! loupe#private#clear_hlmatch(timer) abort
-  " only process the most recent timer
-  if a:timer == g:hlmatch_timer
-    call loupe#private#clear_highlight()
-  endif
-endfunction
-
-" Deactivate hlsearch once the configured timeout has passed since the most
-" recent search command.
-function! loupe#private#clear_hlsearch(timer) abort
-  " only process the most recent timer
-  if a:timer == g:hlsearch_timer
-    set nohlsearch
-  endif
-endfunction
-
-" Called from WinEnter autocmd to clean up stray `matchadd()` vestiges.
-" If we switch into a window and there is no 'hlsearch' in effect but we do have
-" a `w:loupe_hlmatch` variable, it means that `:nohighight` was probably run
-" from another window and we should clean up the straggling match and the
-" window-local variable.
-function! loupe#private#cleanup() abort
-  if !exists('v:hlsearch') || !v:hlsearch
-    call loupe#private#clear_highlight()
-  endif
 endfunction
