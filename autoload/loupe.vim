@@ -13,13 +13,8 @@ function! loupe#clear_highlight() abort
   call loupe#private#set_hlsearch(0)
 endfunction
 
-function! loupe#toggle_highlight() abort
-  if exists('w:loupe_hlmatch') || get(v:, 'hlsearch', 0)
-    call loupe#clear_highlight()
-    redraw
-  else
-    call loupe#add_highlights()
-  endif
+function! loupe#is_highlighted() abort
+  return exists('w:loupe_hlmatch') || get(v:, 'hlsearch', 0)
 endf
 
 " Called from WinEnter autocmd to clean up stray `matchadd()` vestiges.

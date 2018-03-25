@@ -1,6 +1,4 @@
-if exists('g:loaded_loupe') || &compatible || v:version < 700
-  finish
-endif
+if exists('g:loaded_loupe') | finish | endif
 let g:loaded_loupe = 1
 
 augroup LoupeHighlight
@@ -21,7 +19,11 @@ if s:clear
   endif
 endif
 
-nnoremap <silent> <Plug>(loupe_toggle_highlight) :call loupe#toggle_highlight()<CR>
+nmap <silent> <unique> <expr> <Plug>(loupe_toggle_highlight)
+      \ loupe#is_highlighted() ? "\<Plug>(loupe_hi_off)" : "\<Plug>(loupe_hi_on)"
+
+nnoremap <silent> <unique> <Plug>(loupe_hi_off) :call loupe#clear_highlight()<CR>
+nnoremap <silent> <unique> <Plug>(loupe_hi_on)  :call loupe#add_highlights()<CR>
 
 function s:magic_string()
   let s:magic=get(g:, 'loupe_very_magic', 1)
@@ -101,4 +103,4 @@ call s:map('n')  " <Plug>(loupe-n)
 
 " insanity ensues
 nmap <silent> <Plug>(loupe_cword)
-      \ Mmz<C-O><Plug>(loupe-*)<Plug>(loupe-N)`zzz<C-O><Plug>(loupe_toggle_highlight)
+      \ Mmz<C-O><Plug>(loupe-*)<Plug>(loupe-N)`zzz<C-O><Plug>(loupe_hi_on)
