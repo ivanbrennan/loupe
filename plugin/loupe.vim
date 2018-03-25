@@ -19,11 +19,12 @@ if s:clear
   endif
 endif
 
-nmap <silent> <unique> <expr> <Plug>(loupe_toggle_highlight)
-      \ loupe#is_highlighted() ? "\<Plug>(loupe_hi_off)" : "\<Plug>(loupe_hi_on)"
+nnoremap <silent> <unique> <expr> <Plug>(loupe_toggle_highlight)
+      \ loupe#is_highlighted() ? ":call loupe#clear_highlight()\<CR>"
+      \                        : ":call loupe#add_highlights()\<CR>"
 
-nnoremap <silent> <unique> <Plug>(loupe_hi_off) :call loupe#clear_highlight()<CR>
-nnoremap <silent> <unique> <Plug>(loupe_hi_on)  :call loupe#add_highlights()<CR>
+nnoremap <silent> <unique> <Plug>(loupe_cword)
+      \ Mmz<C-O>*N`zzz<C-O>:call loupe#add_highlights()<CR>
 
 function s:magic_string()
   let s:magic=get(g:, 'loupe_very_magic', 1)
@@ -100,7 +101,3 @@ call s:map('N')  " <Plug>(loupe-N)
 call s:map('g#') " <Plug>(loupe-g#)
 call s:map('g*') " <Plug>(loupe-g*)
 call s:map('n')  " <Plug>(loupe-n)
-
-" insanity ensues
-nmap <silent> <Plug>(loupe_cword)
-      \ Mmz<C-O><Plug>(loupe-*)<Plug>(loupe-N)`zzz<C-O><Plug>(loupe_hi_on)
